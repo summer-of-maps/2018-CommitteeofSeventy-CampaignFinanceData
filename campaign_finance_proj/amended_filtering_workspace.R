@@ -43,8 +43,23 @@ for(i in seq_along(unique_concat)){
   
   assign(paste0("data_", this_concat), dat_dupped)
   dat_cc <- rbind(dat_cc, dat_dupped)           
-} 
+}
+
+#incorporating feedback form Ward 31 and Committee of Seventy. Duplication from submitting the report on the same day, not caught in the above system
+ward_31_1 <- dat_cc %>% filter(concat == 'Ward 31 PAC 31 31st Ward Dem. Ex. Comm..2017.3.CFR - Schedule I - Part D - All Other Contributions (Over $250.00)')
+ward_31_1 <- ward_31_1 %>% mutate(index = 1:nrow(ward_31_1)) %>% mutate(intention = if_else(index ==1, "keep", "dups")) %>% select(-index)
+
+ward_31_2 <- dat_cc %>% filter(concat == 'Ward 31 PAC 31 31st Ward Dem. Ex. Comm..2017.3.CFR - Schedule I - Part C - Contributions Received From Political Committees (Over $250.00)'
+                              & Date == '5/11/2017')
+ward_31_2 <- ward_31_2 %>% mutate(index = 1:nrow(ward_31_2)) %>% mutate(intention = if_else(index ==1, "keep", "dups")) %>% select(-index)
+
+ward_31_3 <- dat_cc %>% filter(concat == 'Ward 31 PAC 31 31st Ward Dem. Ex. Comm..2017.3.CFR - Schedule I - Part C - Contributions Received From Political Committees (Over $250.00)'
+                               & Date == '5/13/2017')
+ward_31_3 <- ward_31_3 %>% mutate(index = 1:nrow(ward_31_3)) %>% mutate(intention = if_else(index ==1, "keep", "dups")) %>% select(-index)
+
+dat_cc <- dat_cc %>% filter(concat != 'Ward 31 PAC 31 31st Ward Dem. Ex. Comm..2017.3.CFR - Schedule I - Part D - All Other Contributions (Over $250.00)') %>% 
+                     filter(concat != 'Ward 31 PAC 31 31st Ward Dem. Ex. Comm..2017.3.CFR - Schedule I - Part C - Contributions Received From Political Committees (Over $250.00)')
+
+dat_cc <- rbind(dat_cc, ward_31_1, ward_31_2, ward_31_3)
+
 write.csv(dat_cc, "output/dat_clean_with_dups_indicated.csv", row.names = FALSE)
-
-
-
